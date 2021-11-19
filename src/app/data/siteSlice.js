@@ -7,12 +7,15 @@ export const siteSlice = createSlice({
         feedbackModal: false,
     },
     reducers: {
-        toggleView: (state) => {
-            state.view = state.view === "list" ? "compact" : "list";
+        toggleView: (state, action) => {
+            state.view = action.payload;
+        },
+        toggleFeedbackModal: (state) => {
+            state.feedbackModal = !state.feedbackModal;
         }
     },
 })
 
-export const { toggleView } = siteSlice.actions
+export const { toggleView, toggleFeedbackModal } = siteSlice.actions
 
 export default siteSlice.reducer

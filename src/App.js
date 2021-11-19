@@ -3,8 +3,8 @@ import Main from './components/Main'
 
 function App() {
   return (
-    <div className="App">
-      <div className="flex items-center justify-center">
+    <div className="App bg-gray-200">
+      <div className="flex items-end justify-end">
         <SideBar />
         <Main />
       </div>

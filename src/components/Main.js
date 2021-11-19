@@ -1,15 +1,16 @@
 
-import { useSelector, useDispatch } from 'react-redux'
+import { useSelector } from 'react-redux'
 
 import { useEffect, useState } from 'react';
 
 import { ImCross } from 'react-icons/im';
 import { AiOutlineDoubleRight, AiOutlineDoubleLeft } from "react-icons/ai"
 
+import { motion, AnimatePresence } from 'framer-motion'
+
 
 export default function Main() {
 
-    const dispatch = useDispatch();
     const viewMode = useSelector(state => state.posts.view)
     const [posts, setPosts] = useState([])
     const [page, setPage] = useState(0)
@@ -24,32 +25,53 @@ export default function Main() {
     }, [])
 
     const deletePost = (page, index) => {
-        var newPosts = [...posts]
-        newPosts.splice(index, 1)
-        setPosts(newPosts)
+        var newArray = [...posts]
+        newArray.splice(index, 1)
+        setPosts(newArray)
     }
 
     return (
-        <div className="w-4/5 bg-gray-200">
+        <div className="w-4/5">
             <div className="flex flex-col justify-center items-center h-screen relative">
-                <div className="posts px-12 py-12 overflow-y-auto flex items-center justify-center flex-wrap w-full h-9/12">
-                    {posts.length > 0 && posts.filter((post, i) => {
-                        return i >= page * 6 && i < (page + 1) * 6
-                    }).map(({ title, body, id }, i) => {
-                        return viewMode === "list" ?
-                            <PostList title={title} body={body} deletePost={deletePost} page={page} postnoIndex={i} key={"post-" + id} />
-                            :
-                            <PostCompact title={title} body={body} deletePost={deletePost} page={page} postnoIndex={i} key={"post-" + id} />
-                    })}
+                <div className="overflow-x-hidden posts p-12 overflow-y-auto flex items-start justify-start flex-wrap w-full h-5/6">
+                    <AnimatePresence>
+
+                        {posts.length > 0 && posts.filter((post, i) => {
+                            return i >= page * 6 && i < (page + 1) * 6
+                        }).map(({ title, body, id }, i) => {
+                            return <motion.div
+                                key={"post-" + id}
+                                initial={{ y: 20 * (2 * i), opacity: 0.2 }}
+                                animate={{ y: 0, opacity: 1 }}
+                                exit={viewMode === 'compact' ? { scale: 0.2, opacity: 0.1 } : { opacity: 0.1 }}
+                                transition={{
+                                    duration: 0.3,
+                                    type: "tween",
+                                }}
+                                whileHover={{ scale: 1.03 }}
+                                className={`${viewMode === "compact" ? 'w-1/3' : 'w-full'} relative cursor-pointer flex items-center justify-center relative`}
+                            >
+
+                                {viewMode === "list" ?
+                                    <PostList title={title} body={body} deletePost={deletePost} page={page} postnoIndex={i} />
+                                    :
+                                    <PostCompact title={title} body={body} deletePost={deletePost} page={page} postnoIndex={i} />}
+
+                            </motion.div>
+
+                        })}
+                    </AnimatePresence>
                     {posts.length > 0 && posts[page].length === 0 && <h1>Page {page} is empty.</h1>}
                 </div>
-                <div className="absolute bottom-0 bg-gray-200 w-full pagination h-3/12 flex items-center justify-center p-3">
+                <div className="w-full pagination h-1/6 flex items-center justify-center p-3">
                     {posts.length > 0 &&
                         <>
                             <div>
                                 <button className="cursor-pointer mx-2 rounded-full h-8 w-8 flex items-center justify-center"
                                     onClick={() => {
-                                        if (page !== 0) setPage(page - 1)
+                                        if (page !== 0) {
+                                            setPage(page - 1)
+                                        }
                                     }}>
                                     <AiOutlineDoubleLeft />
                                 </button>
@@ -64,7 +86,8 @@ export default function Main() {
                                         return (
                                             <div key={"pagination-" + i + page}>
                                                 <button
-                                                    className={`cursor-pointer mx-2 rounded-full h-8 w-8 ${page === i + page ? "bg-white shadow-lg" : "text-white bg-gray-400"}`} onClick={() => {
+                                                    className={`cursor-pointer mx-2 rounded-full h-8 w-8 ${page === i + page ? "bg-white shadow-lg" : "text-white bg-gray-400"}`}
+                                                    onClick={() => {
                                                         setPage(i + page)
                                                     }}>
                                                     {page + i + 1}
@@ -76,8 +99,9 @@ export default function Main() {
                             }
                             <div><button className="cursor-pointer mx-2 rounded-full h-8 w-8 flex items-center justify-center"
                                 onClick={() => {
-                                    if (posts[page + 1])
+                                    if (posts[page + 1]) {
                                         setPage(page + 1)
+                                    }
                                 }}
                             >
                                 <AiOutlineDoubleRight />
@@ -93,7 +117,7 @@ export default function Main() {
 
 function PostCompact({ title, body, page, deletePost, postnoIndex }) {
     return (
-        <div className="post w-1/3 p-3">
+        <div className="post w-full p-3">
             <div className="w-full flex items-center justify-center">
                 <div className="bg-white shadow-lg rounded-lg mb-2 w-full overflow-hidden">
                     <div className="w-full flex items-center justify-start flex-col">
